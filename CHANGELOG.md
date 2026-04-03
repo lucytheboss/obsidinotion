@@ -2,14 +2,12 @@
 
 ## [1.1.0] - 2026-04-03
 
-### Improved Notion Aesthetic
+### Improved Notion Aesthetic & Modern UI
 - Updated table styling with lighter borders and Notion-consistent headers.
-- Refined column resize handles.
-- Redesigned Row Modal to look like a Notion Page view (large title, clean property grid).
-- Added a "Search" bar to the toolbar for live row filtering.
-- Added a prominent "+ New" button to the toolbar for quick row creation.
-- Improved the "+ New" row button at the bottom of the table for better alignment.
-- Added a Notion-style "OPEN" button that appears on hover in the first column of the table.
+- **Modern UI Overhaul**: Introduced CSS variables and cleaner spacing inspired by Make-MD.
+- **Improved Toolbar**: Streamlined layout with an integrated floating search bar.
+- **Clean View Tabs**: Refined tab styling with better hover/active states and subtle shadows.
+- **Redesigned Page Modal**: Enhanced Row Modal with backdrop blur and cleaner typography.
 
 ### Features
 - Global search functionality across all view types (Table, Board, Gallery).

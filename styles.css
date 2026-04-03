@@ -65,36 +65,37 @@
 .ne-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: var(--background-modifier-mask);
   z-index: 1000;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 60px;
-  backdrop-filter: blur(2px);
+  padding-top: 100px;
+  backdrop-filter: blur(4px);
 }
 .ne-modal {
   background: var(--background-primary);
-  border-radius: 12px;
-  width: 680px;
-  max-width: calc(100vw - 40px);
-  max-height: 80vh;
+  border-radius: 10px;
+  width: 720px;
+  max-width: calc(100vw - 48px);
+  max-height: 85vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--ne-ui-border);
 }
 .ne-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
+  padding: 12px 20px;
 }
 .ne-modal-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
   color: var(--text-normal);
+  line-height: 1.2;
 }
 .ne-modal-actions {
   display: flex;
@@ -566,19 +567,27 @@
 }
 .ne-onboard-confirm:hover { opacity: 0.9; }
 
-/* ─── Root ────────────────────────────────────────────────────────────────── */
 .ne-root {
+  --ne-ui-border: var(--background-modifier-border);
+  --ne-ui-radius: 6px;
+  --ne-ui-bg: var(--background-primary);
+  --ne-ui-bg-hover: var(--background-modifier-hover);
+  --ne-ui-text-muted: var(--text-muted);
+  --ne-ui-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
   font-family: var(--font-interface);
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--text-normal);
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
+  background: var(--ne-ui-bg);
+  border: 1px solid var(--ne-ui-border);
+  border-radius: var(--ne-ui-radius);
   overflow: hidden;
-  margin: 8px 0;
+  margin: 12px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* ─── Title ──────────────────────────────────────────────────────────────── */
+/* ─── Notion-style column resize ────────────────────────────────────────── */
+
 /* .ne-title-row defined above with full flex layout */
 .ne-title {
   font-size: 20px;
@@ -607,51 +616,65 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--ne-ui-border);
+  background: var(--background-primary);
   position: relative;
 }
-.ne-view-tabs { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
-.ne-toolbar-actions { display: flex; gap: 4px; margin-left: auto; }
+.ne-view-tabs { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
+.ne-toolbar-actions { display: flex; gap: 6px; margin-left: auto; align-items: center; }
 
 .ne-view-tab {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 6px;
+  padding: 4px 12px;
   border: none;
   background: transparent;
-  border-radius: 5px;
+  border-radius: var(--ne-ui-radius);
   cursor: pointer;
   color: var(--text-muted);
   font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
-  transition: background 0.1s, color 0.1s;
+  transition: all 0.1s ease;
 }
-.ne-view-tab:hover { background: var(--background-secondary); color: var(--text-normal); }
+.ne-view-tab:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
 .ne-view-tab.is-active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
+  background: var(--background-primary-alt);
+  color: var(--text-normal);
+  box-shadow: inset 0 0 0 1px var(--ne-ui-border);
 }
-.ne-view-icon { font-size: 13px; }
-.ne-add-view { border: 1px dashed var(--background-modifier-border); }
+.ne-view-icon { font-size: 14px; opacity: 0.7; }
+.ne-add-view { 
+  border: 1px dashed var(--ne-ui-border);
+  padding: 3px 10px;
+}
+.ne-add-view:hover { border-style: solid; }
 
 .ne-tool-btn {
   padding: 4px 10px;
   border: none;
   background: transparent;
-  border-radius: 5px;
+  border-radius: var(--ne-ui-radius);
   cursor: pointer;
   color: var(--text-muted);
   font-size: 13px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 4px;
-  transition: background 0.1s;
+  gap: 6px;
+  transition: all 0.1s ease;
 }
-.ne-tool-btn:hover { background: var(--background-secondary); color: var(--text-normal); }
-.ne-tool-btn.is-active { background: var(--interactive-accent-hover); color: var(--text-on-accent); }
+.ne-tool-btn:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
+.ne-tool-btn.is-active { background: var(--background-primary-alt); color: var(--text-normal); }
+.ne-tool-new {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  padding: 4px 14px;
+}
+.ne-tool-new:hover { background: var(--interactive-accent-hover); color: var(--text-on-accent); }
 
 .ne-badge {
   background: var(--interactive-accent);
@@ -823,24 +846,29 @@
   position: relative;
   display: flex;
   align-items: center;
+  background: var(--background-modifier-form-field);
+  border-radius: var(--ne-ui-radius);
+  padding: 0 10px;
+  border: 1px solid var(--ne-ui-border);
+  transition: all 0.15s ease;
   margin-right: 8px;
 }
+.ne-search-wrap:focus-within {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
 .ne-search-input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid transparent;
+  background: transparent !important;
+  border: none !important;
   color: var(--text-normal);
   font-size: 13px;
-  padding: 4px 8px;
-  width: 120px;
-  transition: width 0.2s, border-color 0.2s;
+  padding: 5px 0 5px 6px !important;
+  width: 110px;
+  transition: width 0.2s;
+  box-shadow: none !important;
 }
-.ne-search-input:focus {
-  width: 200px;
-  border-bottom-color: var(--interactive-accent);
-  outline: none;
-}
-.ne-search-icon { font-size: 12px; color: var(--text-faint); }
+.ne-search-input:focus { width: 180px; outline: none !important; }
+.ne-search-icon { font-size: 12px; color: var(--text-faint); margin-top: 1px; }
 
 .ne-row-num { color: var(--text-faint); font-size: 12px; }
 .ne-row-del {
