@@ -652,6 +652,24 @@
   background: var(--background-primary-alt);
   color: var(--text-normal);
 }
+
+.ne-view-tab-wrap:hover .ne-view-settings-trigger { opacity: 1; }
+.ne-view-settings-trigger {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px 4px;
+  margin-left: -4px;
+  margin-right: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, background 0.1s;
+}
+.ne-view-settings-trigger:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
 .ne-view-icon { font-size: 14px; opacity: 0.7; }
 .ne-add-view { 
   border: 1px dashed var(--ne-ui-border);
@@ -1033,18 +1051,19 @@
 /* ─── Popovers ───────────────────────────────────────────────────────────── */
 .ne-popover {
   position: absolute;
-  z-index: 200;
+  z-index: 1000;
   background: var(--background-primary);
   border: none;
   border-radius: 8px;
-  box-shadow: var(--ne-ui-shadow);
+  box-shadow: var(--ne-ui-shadow), 0 0 0 1px var(--ne-ui-border);
   padding: 6px;
   min-width: 180px;
 }
 .ne-select-popover { top: 100%; left: 0; min-width: 220px; }
 .ne-header-menu { top: 100%; left: 0; }
-.ne-add-view-wrap { position: relative; }
+.ne-add-view-wrap { position: relative; z-index: 1001; }
 .ne-add-view-menu { top: 100%; left: 0; min-width: 160px; }
+.ne-view-settings-menu { top: 100%; left: 0; min-width: 200px; }
 
 .ne-popover-search {
   width: 100%;
