@@ -3,17 +3,26 @@ import { useState } from 'preact/hooks';
 import { ViewConfig, ViewType, FilterRule, SortRule, Property, PropType, PROP_ICON, makeId } from '../types';
 import { useStore, applyFilters } from '../store';
 
+const ICON_FOLDER = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>;
+const ICON_FILTER = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>;
+const ICON_SORT   = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>;
+const ICON_PROPS  = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+
+const VIEW_ICONS: Record<ViewType, any> = {
+  table: <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>,
+  board: <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 9v12"/><path d="M15 9v12"/></svg>,
+  gallery: <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 12h18"/><path d="M12 3v18"/></svg>,
+};
+
 export function Toolbar() {
   const { schema, dispatch } = useStore();
   const [panel, setPanel] = useState<'filter' | 'sort' | 'props' | null>(null);
 
   const view = schema.views.find(v => v.id === schema.activeViewId)!;
-
   const togglePanel = (p: typeof panel) => setPanel(prev => prev === p ? null : p);
 
   return (
     <div class="ne-toolbar">
-      {/* View tabs */}
       <div class="ne-view-tabs">
         {schema.views.map(v => (
           <ViewTab key={v.id} view={v} active={v.id === schema.activeViewId} />
@@ -21,10 +30,9 @@ export function Toolbar() {
         <AddViewButton />
       </div>
 
-      {/* Right-side actions */}
       <div class="ne-toolbar-actions">
         <div class="ne-search-wrap">
-          <span class="ne-search-icon">🔍</span>
+          <span class="ne-search-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
           <input
             class="ne-search-input"
             placeholder="Search..."
@@ -39,24 +47,24 @@ export function Toolbar() {
             onClick={() => dispatch({ type: 'UPDATE_SOURCE', patch: { groupByFolder: !schema.source!.groupByFolder } })}
             title="Folders: Toggle grouping by subfolder"
           >
-            📁
+            {ICON_FOLDER}
           </button>
         )}
         <button class={`ne-tool-btn ne-tool-icon ${panel === 'filter' ? 'is-active' : ''}`}
           onClick={() => togglePanel('filter')}
           title="Filter">
-          ⏳ {(view.filters?.length ?? 0) > 0 && <span class="ne-badge">{view.filters!.length}</span>}
+          {ICON_FILTER} {(view.filters?.length ?? 0) > 0 && <span class="ne-badge">{view.filters!.length}</span>}
         </button>
         <button class={`ne-tool-btn ne-tool-icon ${panel === 'sort' ? 'is-active' : ''}`}
           onClick={() => togglePanel('sort')}
           title="Sort">
-          ⇵ {(view.sorts?.length ?? 0) > 0 && <span class="ne-badge">{view.sorts!.length}</span>}
+          {ICON_SORT} {(view.sorts?.length ?? 0) > 0 && <span class="ne-badge">{view.sorts!.length}</span>}
         </button>
         {view.type === 'board' && <GroupByButton view={view} />}
         <button class={`ne-tool-btn ne-tool-icon ${panel === 'props' ? 'is-active' : ''}`}
           onClick={() => togglePanel('props')}
           title="Properties">
-          ⚙
+          {ICON_PROPS}
         </button>
         <button class="ne-tool-btn ne-tool-new" onClick={() => dispatch({ type: 'ADD_ROW', row: {} })}>
           New
@@ -76,8 +84,6 @@ export function Toolbar() {
 }
 
 // ─── View Tabs ────────────────────────────────────────────────────────────────
-
-const VIEW_ICONS: Record<ViewType, string> = { table: '⊞', board: '⊟', gallery: '⊡' };
 
 function ViewTab({ view, active }: { view: ViewConfig; active: boolean }) {
   const { dispatch } = useStore();
@@ -110,7 +116,8 @@ function AddViewButton() {
                 dispatch({ type: 'SET_ACTIVE_VIEW', viewId: id });
                 setOpen(false);
               }}>
-              {VIEW_ICONS[t]} {t.charAt(0).toUpperCase() + t.slice(1)}
+              <span class="ne-view-icon" style="margin-right:8px;display:inline-flex;align-items:center;">{VIEW_ICONS[t]}</span>
+              {t.charAt(0).toUpperCase() + t.slice(1)}
             </div>
           ))}
         </div>
@@ -145,59 +152,6 @@ function GroupByButton({ view }: { view: ViewConfig }) {
       )}
     </div>
   );
-}
-
-// ─── Filter Panel ─────────────────────────────────────────────────────────────
-
-type OpDef = { label: string; value: FilterRule['op']; noValue?: boolean };
-
-const OPS_BY_TYPE: Record<string, OpDef[]> = {
-  text: [
-    { label: 'contains',         value: 'contains' },
-    { label: 'does not contain', value: 'does_not_contain' },
-    { label: 'is',               value: 'equals' },
-    { label: 'is not',           value: 'is_not' },
-    { label: 'starts with',      value: 'starts_with' },
-    { label: 'is empty',         value: 'is_empty',     noValue: true },
-    { label: 'is not empty',     value: 'is_not_empty', noValue: true },
-  ],
-  number: [
-    { label: '=',          value: 'equals' },
-    { label: '≠',          value: 'neq' },
-    { label: '>',          value: 'gt' },
-    { label: '≥',          value: 'gte' },
-    { label: '<',          value: 'lt' },
-    { label: '≤',          value: 'lte' },
-    { label: 'is empty',   value: 'is_empty',     noValue: true },
-    { label: 'is not empty', value: 'is_not_empty', noValue: true },
-  ],
-  checkbox: [
-    { label: 'is checked',     value: 'is_checked',     noValue: true },
-    { label: 'is not checked', value: 'is_not_checked', noValue: true },
-  ],
-  select: [
-    { label: 'is',           value: 'equals' },
-    { label: 'is not',       value: 'is_not' },
-    { label: 'is empty',     value: 'is_empty',     noValue: true },
-    { label: 'is not empty', value: 'is_not_empty', noValue: true },
-  ],
-  multi_select: [
-    { label: 'is',           value: 'equals' },
-    { label: 'is not',       value: 'is_not' },
-    { label: 'is empty',     value: 'is_empty',     noValue: true },
-    { label: 'is not empty', value: 'is_not_empty', noValue: true },
-  ],
-  date: [
-    { label: 'is',         value: 'equals' },
-    { label: 'is before',  value: 'is_before' },
-    { label: 'is after',   value: 'is_after' },
-    { label: 'is empty',   value: 'is_empty',     noValue: true },
-    { label: 'is not empty', value: 'is_not_empty', noValue: true },
-  ],
-};
-
-function getOpsForType(type: string): OpDef[] {
-  return OPS_BY_TYPE[type] ?? OPS_BY_TYPE['text'];
 }
 
 function FilterPanel({ view, props, allFilterProps }: { view: ViewConfig; props: Property[]; allFilterProps: Property[] }) {
@@ -256,8 +210,6 @@ function FilterPanel({ view, props, allFilterProps }: { view: ViewConfig; props:
   );
 }
 
-// ─── Sort Panel ───────────────────────────────────────────────────────────────
-
 function SortPanel({ view, props }: { view: ViewConfig; props: Property[] }) {
   const { dispatch } = useStore();
   const sorts = view.sorts ?? [];
@@ -287,8 +239,6 @@ function SortPanel({ view, props }: { view: ViewConfig; props: Property[] }) {
   );
 }
 
-// ─── Properties Panel ─────────────────────────────────────────────────────────
-
 function PropsPanel({ props }: { props: Property[] }) {
   const { dispatch } = useStore();
 
@@ -307,4 +257,55 @@ function PropsPanel({ props }: { props: Property[] }) {
       ))}
     </div>
   );
+}
+
+type OpDef = { label: string; value: FilterRule['op']; noValue?: boolean };
+
+const OPS_BY_TYPE: Record<string, OpDef[]> = {
+  text: [
+    { label: 'contains',         value: 'contains' },
+    { label: 'does not contain', value: 'does_not_contain' },
+    { label: 'is',               value: 'equals' },
+    { label: 'is not',           value: 'is_not' },
+    { label: 'starts with',      value: 'starts_with' },
+    { label: 'is empty',         value: 'is_empty',     noValue: true },
+    { label: 'is not empty',     value: 'is_not_empty', noValue: true },
+  ],
+  number: [
+    { label: '=',          value: 'equals' },
+    { label: '≠',          value: 'neq' },
+    { label: '>',          value: 'gt' },
+    { label: '≥',          value: 'gte' },
+    { label: '<',          value: 'lt' },
+    { label: '≤',          value: 'lte' },
+    { label: 'is empty',   value: 'is_empty',     noValue: true },
+    { label: 'is not empty', value: 'is_not_empty', noValue: true },
+  ],
+  checkbox: [
+    { label: 'is checked',     value: 'is_checked',     noValue: true },
+    { label: 'is not checked', value: 'is_not_checked', noValue: true },
+  ],
+  select: [
+    { label: 'is',           value: 'equals' },
+    { label: 'is not',       value: 'is_not' },
+    { label: 'is empty',     value: 'is_empty',     noValue: true },
+    { label: 'is not empty', value: 'is_not_empty', noValue: true },
+  ],
+  multi_select: [
+    { label: 'is',           value: 'equals' },
+    { label: 'is not',       value: 'is_not' },
+    { label: 'is empty',     value: 'is_empty',     noValue: true },
+    { label: 'is not empty', value: 'is_not_empty', noValue: true },
+  ],
+  date: [
+    { label: 'is',         value: 'equals' },
+    { label: 'is before',  value: 'is_before' },
+    { label: 'is after',   value: 'is_after' },
+    { label: 'is empty',   value: 'is_empty',     noValue: true },
+    { label: 'is not empty', value: 'is_not_empty', noValue: true },
+  ],
+};
+
+function getOpsForType(type: string): OpDef[] {
+  return OPS_BY_TYPE[type] ?? OPS_BY_TYPE['text'];
 }

@@ -374,18 +374,19 @@
 
 .ne-title-toggle {
   margin-left: auto;
-  background: none;
-  border: none;
+  background: var(--background-secondary);
+  border: 1px solid var(--ne-ui-border);
   cursor: pointer;
-  font-size: 14px;
-  padding: 2px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 8px;
   border-radius: 4px;
-  opacity: 0.3;
-  transition: opacity 0.15s;
-  line-height: 1;
+  color: var(--text-muted);
+  transition: all 0.15s;
 }
-.ne-title-toggle:hover { opacity: 0.8; }
-.ne-title-toggle.is-hidden { opacity: 0.6; }
+.ne-title-toggle:hover { color: var(--text-normal); background: var(--ne-ui-bg-hover); }
 
 /* ─── Source badge ───────────────────────────────────────────────────────── */
 .ne-source-badge {
@@ -583,10 +584,12 @@
   background: var(--ne-ui-bg);
   border: 1px solid var(--ne-ui-border);
   border-radius: var(--ne-ui-radius);
-  overflow: hidden;
+  overflow: visible;
   margin: 12px 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+
+.ne-view-body { overflow: visible; }
 
 /* ─── Notion-style column resize ────────────────────────────────────────── */
 
@@ -628,8 +631,9 @@
 .ne-toolbar-actions { display: flex; gap: 6px; margin-left: auto; align-items: center; }
 
 .ne-view-tab {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 4px 12px;
   border: none;
@@ -641,7 +645,9 @@
   font-weight: 500;
   white-space: nowrap;
   transition: all 0.1s ease;
+  line-height: 1;
 }
+.ne-view-tab svg { display: block; flex-shrink: 0; }
 .ne-view-tab:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
 .ne-view-tab.is-active {
   background: var(--background-primary-alt);
@@ -664,11 +670,14 @@
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 500;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   transition: all 0.1s ease;
+  line-height: 1;
 }
+.ne-tool-btn svg { display: block; flex-shrink: 0; }
 .ne-tool-btn:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
 .ne-tool-btn.is-active { background: var(--background-primary-alt); color: var(--text-normal); }
 .ne-tool-icon {
