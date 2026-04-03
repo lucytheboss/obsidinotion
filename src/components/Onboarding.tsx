@@ -43,7 +43,7 @@ export function Onboarding() {
   const selectedFolder = selected ? folders.find(f => f.path === selected) : null;
 
   const selectedSource: DbSource | null = selected
-    ? { type: 'folder', folder: selected.replace(/^\//, '').replace(/\/$/, '') }
+    ? { type: 'folder', folder: selected.replace(/^\//, '').replace(/\/$/, ''), groupByFolder: true }
     : null;
 
   const previewProps = useMemo(() => {

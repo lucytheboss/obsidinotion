@@ -35,25 +35,28 @@ export function Toolbar() {
 
         {schema.source && (
           <button
-            class={`ne-tool-btn ${schema.source.groupByFolder ? 'is-active' : ''}`}
+            class={`ne-tool-btn ne-tool-icon ${schema.source.groupByFolder ? 'is-active' : ''}`}
             onClick={() => dispatch({ type: 'UPDATE_SOURCE', patch: { groupByFolder: !schema.source!.groupByFolder } })}
-            title="Group rows by subfolder"
+            title="Folders: Toggle grouping by subfolder"
           >
-            📁 Folders
+            📁
           </button>
         )}
-        <button class={`ne-tool-btn ${panel === 'filter' ? 'is-active' : ''}`}
-          onClick={() => togglePanel('filter')}>
-          Filter {(view.filters?.length ?? 0) > 0 && <span class="ne-badge">{view.filters!.length}</span>}
+        <button class={`ne-tool-btn ne-tool-icon ${panel === 'filter' ? 'is-active' : ''}`}
+          onClick={() => togglePanel('filter')}
+          title="Filter">
+          ⏳ {(view.filters?.length ?? 0) > 0 && <span class="ne-badge">{view.filters!.length}</span>}
         </button>
-        <button class={`ne-tool-btn ${panel === 'sort' ? 'is-active' : ''}`}
-          onClick={() => togglePanel('sort')}>
-          Sort {(view.sorts?.length ?? 0) > 0 && <span class="ne-badge">{view.sorts!.length}</span>}
+        <button class={`ne-tool-btn ne-tool-icon ${panel === 'sort' ? 'is-active' : ''}`}
+          onClick={() => togglePanel('sort')}
+          title="Sort">
+          ⇵ {(view.sorts?.length ?? 0) > 0 && <span class="ne-badge">{view.sorts!.length}</span>}
         </button>
         {view.type === 'board' && <GroupByButton view={view} />}
-        <button class={`ne-tool-btn ${panel === 'props' ? 'is-active' : ''}`}
-          onClick={() => togglePanel('props')}>
-          Properties
+        <button class={`ne-tool-btn ne-tool-icon ${panel === 'props' ? 'is-active' : ''}`}
+          onClick={() => togglePanel('props')}
+          title="Properties">
+          ⚙
         </button>
         <button class="ne-tool-btn ne-tool-new" onClick={() => dispatch({ type: 'ADD_ROW', row: {} })}>
           New

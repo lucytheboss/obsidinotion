@@ -671,6 +671,12 @@
 }
 .ne-tool-btn:hover { background: var(--ne-ui-bg-hover); color: var(--text-normal); }
 .ne-tool-btn.is-active { background: var(--background-primary-alt); color: var(--text-normal); }
+.ne-tool-icon {
+  font-size: 16px;
+  padding: 4px 6px;
+  opacity: 0.8;
+}
+.ne-tool-icon:hover { opacity: 1; }
 .ne-tool-new {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
