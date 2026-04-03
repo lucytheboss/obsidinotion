@@ -1,0 +1,9 @@
+{
+  "id": "notion-engine",
+  "name": "Notion Engine",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Notion-style database (Table, Board, Gallery) inside any Markdown file.",
+  "author": "lucyroh",
+  "isDesktopOnly": false
+}
