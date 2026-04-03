@@ -3,6 +3,8 @@
 ## [1.1.0] - 2026-04-03
 
 ### Improved Notion Aesthetic & Modern UI
+- **Calculation Row**: Moved to the absolute end of the table body.
+- **Persistent Settings**: The number of rows to show (page size) is now saved as a database view setting.
 - **Wrap Column**: Added option to wrap text in table columns (via column header menu).
 - Updated table styling with lighter borders and Notion-consistent headers.
 - **Modern UI Overhaul**: Introduced CSS variables and cleaner spacing inspired by Make-MD.

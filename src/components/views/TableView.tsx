@@ -15,8 +15,10 @@ export function TableView() {
   const groupByFolder = isSourced && !!schema.source?.groupByFolder;
   const visibleProps = schema.properties.filter(p => !p.hidden);
 
-  const [pageSize, setPageSize] = useState<number>(25);
   const [expandedRow, setExpandedRow] = useState<Row | null>(null);
+
+  const pageSize = view.pageSize ?? 25;
+  const setPageSize = (n: number) => dispatch({ type: 'UPDATE_VIEW', view: { ...view, pageSize: n } });
 
   let rows = applyFilters(allRows, view.filters ?? []);
   rows = applySorts(rows, view.sorts ?? []);
@@ -80,15 +82,13 @@ export function TableView() {
               </td>
             </tr>
           )}
-        </tbody>
-        {/* Summary row — bottom */}
-        <tfoot>
+          {/* Summary row — bottom of body */}
           <tr class="ne-calculate-row">
             <td class="ne-td-index" />
             {visibleProps.map(p => <CalculateCell key={p.id} prop={p} rows={displayRows} />)}
             {!isSourced && <td />}
           </tr>
-        </tfoot>
+        </tbody>
       </table>
 
       {isSourced && rows.length === 0 && !groupByFolder && (

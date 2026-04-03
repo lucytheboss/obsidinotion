@@ -893,7 +893,7 @@
 .ne-row-del:hover { color: var(--text-error); background: var(--background-modifier-error); }
 
 /* ─── Calculate row ──────────────────────────────────────────────────────── */
-.ne-calculate-row { border-bottom: 1px solid var(--background-modifier-border); }
+.ne-calculate-row { border-top: 1px solid var(--background-modifier-border); border-bottom: none; }
 .ne-calc-cell { position: relative; padding: 0; }
 .ne-calc-inner {
   padding: 5px 8px;

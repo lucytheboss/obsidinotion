@@ -82,6 +82,7 @@ export interface ViewConfig {
   groupBy?: string;
   filters?: FilterRule[];
   sorts?: SortRule[];
+  pageSize?: number;
 }
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
