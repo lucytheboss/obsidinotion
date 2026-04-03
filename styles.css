@@ -188,6 +188,8 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 .ne-ext-badge {
   flex-shrink: 0;
@@ -822,6 +824,14 @@
   border-right: 1px solid var(--background-modifier-border);
   vertical-align: middle;
   max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ne-td-wrap {
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
 }
 .ne-td-index { width: 32px; text-align: center; color: var(--text-faint); font-size: 11px; }
 

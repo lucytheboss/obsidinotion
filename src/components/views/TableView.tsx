@@ -287,6 +287,9 @@ function HeaderCell({ prop, isSourced }: { prop: Property; isSourced: boolean })
           ) : (
             <>
               {!isSourced && <div class="ne-menu-item" onClick={() => setRenaming(true)}>Rename</div>}
+              <div class="ne-menu-item" onClick={() => { dispatch({ type: 'UPDATE_PROPERTY', prop: { ...prop, wrap: !prop.wrap } }); setMenuOpen(false); }}>
+                {prop.wrap ? 'Unwrap column' : 'Wrap column'}
+              </div>
               <div class="ne-menu-item" onClick={() => { dispatch({ type: 'UPDATE_PROPERTY', prop: { ...prop, hidden: true } }); setMenuOpen(false); }}>Hide column</div>
               {!isSourced && (
                 <>
@@ -398,7 +401,7 @@ function TableRow({ row, index, props, isSourced, depth = 0, onExpand }: {
         }
       </td>
       {props.map((p, i) => (
-        <td key={p.id} class="ne-td" style={{ width: `${p.width ?? 160}px` }}>
+        <td key={p.id} class={`ne-td ${p.wrap ? 'ne-td-wrap' : ''}`} style={{ width: `${p.width ?? 160}px` }}>
           {i === 0
             ? <div class="ne-name-cell" style={indent > 0 ? `padding-left: ${indent + 8}px` : ''}>
                 {row._ext && row._ext !== 'md' && (

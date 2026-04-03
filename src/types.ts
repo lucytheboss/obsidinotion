@@ -36,6 +36,7 @@ export interface Property {
   type: PropType;
   width?: number;
   hidden?: boolean;
+  wrap?: boolean;    // column text wrapping
   options?: SelectOption[];
   coverProp?: boolean;
 }

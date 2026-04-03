@@ -3,6 +3,7 @@
 ## [1.1.0] - 2026-04-03
 
 ### Improved Notion Aesthetic & Modern UI
+- **Wrap Column**: Added option to wrap text in table columns (via column header menu).
 - Updated table styling with lighter borders and Notion-consistent headers.
 - **Modern UI Overhaul**: Introduced CSS variables and cleaner spacing inspired by Make-MD.
 - **Improved Toolbar**: Streamlined layout with an integrated floating search bar.
