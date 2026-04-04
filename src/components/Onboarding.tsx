@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useMemo } from 'preact/hooks';
+import { useState, useMemo, useRef, useEffect } from 'preact/hooks';
 import { TFolder } from 'obsidian';
 import { DbSource, makeId } from '../types';
 import { useStore, autoDetectProperties, fetchSourcedRows } from '../store';
@@ -33,6 +33,8 @@ export function Onboarding() {
   const { schema, app, dispatch, save } = useStore();
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const folders = useMemo(() => getAllFolders(app), []);
 
@@ -50,6 +52,16 @@ export function Onboarding() {
     if (!selectedSource) return [];
     return autoDetectProperties(app, selectedSource);
   }, [selected]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const confirm = () => {
     if (!selectedSource) return;
@@ -77,31 +89,42 @@ export function Onboarding() {
           </p>
         </div>
 
-        {/* Search */}
-        <input
-          class="ne-onboard-search"
-          placeholder="Search folders…"
-          value={search}
-          onInput={e => setSearch((e.target as HTMLInputElement).value)}
-          autoFocus
-        />
+        {/* Search & Dropdown */}
+        <div class="ne-onboard-search-wrap" ref={containerRef}>
+          <input
+            class="ne-onboard-search"
+            placeholder="Search folders…"
+            value={search || (selectedFolder?.name ?? '')}
+            onFocus={() => setShowDropdown(true)}
+            onInput={e => {
+              setSearch((e.target as HTMLInputElement).value);
+              setShowDropdown(true);
+            }}
+            autoFocus
+          />
 
-        {/* Folder list */}
-        <div class="ne-onboard-folder-list">
-          {filtered.length === 0 && (
-            <div class="ne-onboard-empty">No folders found</div>
+          {showDropdown && (
+            <div class="ne-onboard-dropdown">
+              {filtered.length === 0 && (
+                <div class="ne-onboard-empty">No folders found</div>
+              )}
+              {filtered.map(f => (
+                <button
+                  key={f.path}
+                  class={`ne-onboard-folder-row ${selected === f.path ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    setSelected(f.path);
+                    setSearch('');
+                    setShowDropdown(false);
+                  }}
+                >
+                  <span class="ne-onboard-folder-icon">📁</span>
+                  <span class="ne-onboard-folder-name">{f.name}</span>
+                  <span class="ne-onboard-folder-count">{f.fileCount} file{f.fileCount !== 1 ? 's' : ''}</span>
+                </button>
+              ))}
+            </div>
           )}
-          {filtered.map(f => (
-            <button
-              key={f.path}
-              class={`ne-onboard-folder-row ${selected === f.path ? 'is-selected' : ''}`}
-              onClick={() => setSelected(f.path === selected ? null : f.path)}
-            >
-              <span class="ne-onboard-folder-icon">📁</span>
-              <span class="ne-onboard-folder-name">{f.name}</span>
-              <span class="ne-onboard-folder-count">{f.fileCount} file{f.fileCount !== 1 ? 's' : ''}</span>
-            </button>
-          ))}
         </div>
 
         {/* Column preview */}
