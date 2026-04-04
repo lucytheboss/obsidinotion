@@ -469,20 +469,16 @@
 
 /* ─── Popovers ───────────────────────────────────────────────────────────── */
 .ne-popover {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
+  position: fixed;
+  z-index: 5000;
   background: var(--background-primary);
   border: none;
   border-radius: 8px;
   box-shadow: var(--ne-ui-shadow), 0 0 0 1px var(--ne-ui-border);
   padding: 6px;
   min-width: 180px;
-  margin-top: 4px;
 }
 .ne-select-popover { min-width: 220px; }
-.ne-header-menu { left: auto; right: 0; }
 .ne-add-view-wrap { position: relative; }
 .ne-add-view-menu { min-width: 160px; }
 .ne-view-settings-menu { min-width: 200px; }

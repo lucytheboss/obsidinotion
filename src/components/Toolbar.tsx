@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useRef, useEffect } from 'preact/hooks';
+import { useState, useRef, useEffect, useLayoutEffect } from 'preact/hooks';
 import { ViewConfig, ViewType, FilterRule, SortRule, Property, PropType, PROP_ICON, makeId } from '../types';
 import { useStore, applyFilters } from '../store';
 
@@ -18,12 +18,13 @@ const VIEW_ICONS: Record<ViewType, any> = {
 export function Toolbar() {
   const { schema, dispatch } = useStore();
   const [panel, setPanel] = useState<'filter' | 'sort' | 'props' | null>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
 
   const view = schema.views.find(v => v.id === schema.activeViewId)!;
   const togglePanel = (p: typeof panel) => setPanel(prev => prev === p ? null : p);
 
   return (
-    <div class="ne-toolbar">
+    <div class="ne-toolbar" ref={toolbarRef}>
       <div class="ne-view-tabs">
         {schema.views.map(v => (
           <ViewTab key={v.id} view={v} active={v.id === schema.activeViewId} />
@@ -72,7 +73,7 @@ export function Toolbar() {
         </button>
       </div>
 
-      {/* Panels */}
+      {/* Panels (Standard absolute for simplicity if clipped is not an issue for these) */}
       {panel === 'filter' && <FilterPanel view={view} props={schema.properties} allFilterProps={
         schema.source
           ? [...schema.properties, { id: '_folder', label: 'Folder', type: 'text' as PropType, width: 160 }]
@@ -89,9 +90,18 @@ export function Toolbar() {
 function ViewTab({ view, active }: { view: ViewConfig; active: boolean }) {
   const { dispatch } = useStore();
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
 
   return (
-    <div class="ne-view-tab-wrap" style="position:relative;display:flex;align-items:center;">
+    <div class="ne-view-tab-wrap" ref={btnRef} style="position:relative;display:flex;align-items:center;">
       <button
         class={`ne-view-tab ${active ? 'is-active' : ''}`}
         onClick={() => dispatch({ type: 'SET_ACTIVE_VIEW', viewId: view.id })}
@@ -102,18 +112,18 @@ function ViewTab({ view, active }: { view: ViewConfig; active: boolean }) {
       <button class="ne-view-settings-trigger" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
         {ICON_CHEVRON_DOWN}
       </button>
-      {open && <ViewSettingsMenu view={view} onClose={() => setOpen(false)} />}
+      {open && <ViewSettingsMenu view={view} pos={pos} onClose={() => setOpen(false)} />}
     </div>
   );
 }
 
-function ViewSettingsMenu({ view, onClose }: { view: ViewConfig; onClose: () => void }) {
+function ViewSettingsMenu({ view, pos, onClose }: { view: ViewConfig; pos: { top: number; left: number }; onClose: () => void }) {
   const { dispatch } = useStore();
   const [label, setLabel] = useState(view.label);
   const types: ViewType[] = ['table', 'board', 'gallery'];
 
   return (
-    <div class="ne-popover ne-view-settings-menu">
+    <div class="ne-popover ne-view-settings-menu" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
       <div class="ne-menu-label">Rename view</div>
       <input class="ne-popover-search" value={label}
         onInput={e => setLabel((e.target as HTMLInputElement).value)}
@@ -147,13 +157,22 @@ function ViewSettingsMenu({ view, onClose }: { view: ViewConfig; onClose: () => 
 function AddViewButton() {
   const { dispatch } = useStore();
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
   const types: ViewType[] = ['table', 'board', 'gallery'];
+
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
 
   return (
     <div class="ne-add-view-wrap">
-      <button class="ne-view-tab ne-add-view" onClick={() => setOpen(o => !o)}>+ Add view</button>
+      <button class="ne-view-tab ne-add-view" ref={btnRef} onClick={() => setOpen(o => !o)}>+ Add view</button>
       {open && (
-        <div class="ne-popover ne-add-view-menu">
+        <div class="ne-popover ne-add-view-menu" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           {types.map(t => (
             <div key={t} class="ne-menu-item"
               onClick={() => {
@@ -177,16 +196,25 @@ function AddViewButton() {
 function GroupByButton({ view }: { view: ViewConfig }) {
   const { schema, dispatch } = useStore();
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
   const selectProps = schema.properties.filter(p => p.type === 'select');
   const current = schema.properties.find(p => p.id === view.groupBy);
 
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
+
   return (
     <div class="ne-add-view-wrap">
-      <button class={`ne-tool-btn ${view.groupBy ? 'is-active' : ''}`} onClick={() => setOpen(o => !o)}>
+      <button ref={btnRef} class={`ne-tool-btn ${view.groupBy ? 'is-active' : ''}`} onClick={() => setOpen(o => !o)}>
         Group: {current?.label ?? 'None'}
       </button>
       {open && (
-        <div class="ne-popover">
+        <div class="ne-popover" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           <div class="ne-menu-item" onClick={() => { dispatch({ type: 'UPDATE_VIEW', view: { ...view, groupBy: undefined } }); setOpen(false); }}>None</div>
           {selectProps.map(p => (
             <div key={p.id} class={`ne-menu-item ${p.id === view.groupBy ? 'is-active' : ''}`}
