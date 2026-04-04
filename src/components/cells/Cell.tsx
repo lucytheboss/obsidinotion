@@ -1,5 +1,5 @@
 import { h, Fragment } from 'preact';
-import { useState, useRef, useEffect, useCallback } from 'preact/hooks';
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'preact/hooks';
 import { Property, SelectOption, TagColor, TAG_COLORS, makeId, makeSelectOption } from '../../types';
 import { useStore } from '../../store';
 
@@ -183,11 +183,19 @@ function SelectCell({ prop, value, commit }: { prop: Property; value: any; commi
   const { dispatch } = useStore();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    if (open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    const close = (e: MouseEvent) => { if (!containerRef.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, [open]);
@@ -213,12 +221,12 @@ function SelectCell({ prop, value, commit }: { prop: Property; value: any; commi
   };
 
   return (
-    <div ref={ref} class="ne-cell-select">
+    <div ref={containerRef} class="ne-cell-select">
       <div class="ne-cell-select-trigger" onClick={() => setOpen(o => !o)}>
         {current ? <Tag opt={current} /> : <span class="ne-cell-empty" />}
       </div>
       {open && (
-        <div class="ne-popover ne-select-popover">
+        <div class="ne-popover ne-select-popover" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           <input
             class="ne-popover-search"
             placeholder="Search or create..."
@@ -255,7 +263,15 @@ function MultiSelectCell({ prop, value, commit }: { prop: Property; value: any; 
   const { dispatch } = useStore();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    if (open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
 
   const selected: string[] = Array.isArray(value) ? value : [];
   const opts = prop.options ?? [];
@@ -263,7 +279,7 @@ function MultiSelectCell({ prop, value, commit }: { prop: Property; value: any; 
 
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    const close = (e: MouseEvent) => { if (!containerRef.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, [open]);
@@ -286,7 +302,7 @@ function MultiSelectCell({ prop, value, commit }: { prop: Property; value: any; 
   };
 
   return (
-    <div ref={ref} class="ne-cell-select">
+    <div ref={containerRef} class="ne-cell-select">
       <div class="ne-cell-select-trigger ne-cell-multi" onClick={() => setOpen(o => !o)}>
         {selected.length === 0
           ? <span class="ne-cell-empty" />
@@ -297,7 +313,7 @@ function MultiSelectCell({ prop, value, commit }: { prop: Property; value: any; 
         }
       </div>
       {open && (
-        <div class="ne-popover ne-select-popover">
+        <div class="ne-popover ne-select-popover" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           <input
             class="ne-popover-search"
             placeholder="Search or create..."

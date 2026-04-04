@@ -1,5 +1,5 @@
 import { h, Fragment } from 'preact';
-import { useState, useRef } from 'preact/hooks';
+import { useState, useRef, useEffect, useLayoutEffect } from 'preact/hooks';
 import { Property, Row, makeId, PropType, PROP_ICON, ViewConfig } from '../../types';
 import { useStore, useRows, applyFilters, applySorts, applySearch } from '../../store';
 import { Cell } from '../cells/Cell';
@@ -231,6 +231,21 @@ function HeaderCell({ prop, isSourced }: { prop: Property; isSourced: boolean })
   const [label, setLabel] = useState(prop.label);
   const thRef = useRef<HTMLTableCellElement>(null);
   const liveWidthRef = useRef<number>(prop.width ?? 160);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    if (menuOpen && thRef.current) {
+      const rect = thRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent) => { if (thRef.current && !thRef.current.contains(e.target as Node)) setMenuOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
 
   const startResize = (e: MouseEvent) => {
     e.preventDefault();
@@ -273,7 +288,7 @@ function HeaderCell({ prop, isSourced }: { prop: Property; isSourced: boolean })
       </div>
       <div class="ne-col-resize" onMouseDown={startResize} />
       {menuOpen && !isSystem && (
-        <div class="ne-popover ne-header-menu">
+        <div class="ne-popover ne-header-menu" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           {renaming ? (
             <input class="ne-popover-search" value={label}
               onInput={e => setLabel((e.target as HTMLInputElement).value)}
@@ -415,6 +430,23 @@ type CalcFn = 'none' | 'count' | 'sum' | 'avg' | 'min' | 'max';
 function CalculateCell({ prop, rows }: { prop: Property; rows: Row[] }) {
   const [fn, setFn] = useState<CalcFn>('none');
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    if (open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => { if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
   const available: CalcFn[] = prop.type === 'number'
     ? ['none','count','sum','avg','min','max']
     : ['none','count'];
@@ -433,11 +465,11 @@ function CalculateCell({ prop, rows }: { prop: Property; rows: Row[] }) {
 
   return (
     <td class="ne-td ne-calc-cell" style={{ width: `${prop.width ?? 160}px` }}>
-      <div class="ne-calc-inner" onClick={() => setOpen(o => !o)}>
+      <div ref={containerRef} class="ne-calc-inner" onClick={() => setOpen(o => !o)}>
         {fn === 'none' ? <span class="ne-calc-hint">Calculate</span> : <span class="ne-calc-result">{fn.toUpperCase()} {result()}</span>}
       </div>
       {open && (
-        <div class="ne-popover ne-calc-popover">
+        <div class="ne-popover ne-calc-popover" style={{ top: `${pos.top}px`, left: `${pos.left}px` }}>
           {available.map(f => (
             <div key={f} class={`ne-menu-item ${f === fn ? 'is-active' : ''}`}
               onClick={() => { setFn(f); setOpen(false); }}>
