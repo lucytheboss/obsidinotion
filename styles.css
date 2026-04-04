@@ -553,6 +553,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.ne-td-wrap { white-space: normal; overflow: visible; word-break: break-word; }
 .ne-tr { border-bottom: 1px solid var(--ne-ui-border); }
 .ne-tr:hover { background: var(--ne-ui-bg-hover); }
 

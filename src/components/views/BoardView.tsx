@@ -26,7 +26,7 @@ export function BoardView() {
   ];
 
   return (
-    <div class="ne-board">
+    <div class="ne-board" style="margin-top: 20px;">
       {columns.map(col => (
         <BoardColumn key={col.opt?.id ?? '__none__'}
           opt={col.opt} rows={col.rows} groupProp={groupProp}

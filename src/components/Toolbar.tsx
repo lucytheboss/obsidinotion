@@ -137,6 +137,13 @@ function ViewSettingsMenu({ view, pos, onClose }: { view: ViewConfig; pos: { top
         autoFocus />
       
       <div class="ne-menu-sep" />
+      <div class="ne-menu-label">Settings</div>
+      <div class="ne-menu-item" onClick={() => { dispatch({ type: 'UPDATE_VIEW', view: { ...view, wrap: !view.wrap } }); onClose(); }}>
+        <input type="checkbox" checked={!!view.wrap} style="margin-right:8px;pointer-events:none;" />
+        Wrap columns
+      </div>
+
+      <div class="ne-menu-sep" />
       <div class="ne-menu-label">Change type</div>
       {types.map(t => (
         <div key={t} class={`ne-menu-item ${t === view.type ? 'is-active' : ''}`}

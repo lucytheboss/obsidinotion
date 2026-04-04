@@ -1,6 +1,6 @@
 import { h, Fragment } from 'preact';
 import { useState, useRef } from 'preact/hooks';
-import { Property, Row, makeId, PropType, PROP_ICON } from '../../types';
+import { Property, Row, makeId, PropType, PROP_ICON, ViewConfig } from '../../types';
 import { useStore, useRows, applyFilters, applySorts, applySearch } from '../../store';
 import { Cell } from '../cells/Cell';
 import { RowModal } from '../RowModal';
@@ -41,7 +41,7 @@ export function TableView() {
   const colSpan = visibleProps.length + (isSourced ? 1 : 2);
 
   return (
-    <div class="ne-table-wrap">
+    <div class="ne-table-wrap" style="min-width: 100%;">
       {expandedRow && (
         <RowModal
           row={expandedRow}
@@ -50,7 +50,7 @@ export function TableView() {
           onClose={() => setExpandedRow(null)}
         />
       )}
-      <table class="ne-table">
+      <table class="ne-table" style="min-width: 100%;">
         <thead>
           <tr>
             <th class="ne-th ne-th-index">#</th>
@@ -67,9 +67,9 @@ export function TableView() {
         </thead>
         <tbody>
           {groupByFolder
-            ? <FolderGroupedBody rows={displayRows} props={visibleProps} colSpan={colSpan} onExpand={setExpandedRow} />
+            ? <FolderGroupedBody rows={displayRows} props={visibleProps} colSpan={colSpan} onExpand={setExpandedRow} view={view} />
             : displayRows.map((row, i) => (
-                <TableRow key={row._id} row={row} index={i + 1} props={visibleProps} isSourced={isSourced} onExpand={setExpandedRow} />
+                <TableRow key={row._id} row={row} index={i + 1} props={visibleProps} isSourced={isSourced} onExpand={setExpandedRow} view={view} />
               ))
           }
           {!isSourced && (
@@ -105,16 +105,15 @@ export function TableView() {
         <div class="ne-page-size">
           <span class="ne-page-size-label">Show:</span>
           {PAGE_SIZES.map((n, i) => (
-            <>
+            <Fragment key={n}>
               {i > 0 && <span class="ne-page-size-sep">·</span>}
               <button
-                key={n}
                 class={`ne-page-size-link ${pageSize === n ? 'is-active' : ''}`}
                 onClick={() => setPageSize(n)}
               >
                 {n === 0 ? 'All' : n}
               </button>
-            </>
+            </Fragment>
           ))}
         </div>
       </div>
@@ -161,7 +160,7 @@ function buildTree(rows: Row[]): TreeNode {
 
 // ─── Folder-grouped body ──────────────────────────────────────────────────────
 
-function FolderGroupedBody({ rows, props, colSpan, onExpand }: { rows: Row[]; props: Property[]; colSpan: number; onExpand: (row: Row) => void }) {
+function FolderGroupedBody({ rows, props, colSpan, onExpand, view }: { rows: Row[]; props: Property[]; colSpan: number; onExpand: (row: Row) => void; view: ViewConfig }) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const counter = { n: 0 };
 
@@ -174,22 +173,22 @@ function FolderGroupedBody({ rows, props, colSpan, onExpand }: { rows: Row[]; pr
   };
 
   const tree = buildTree(rows);
-  // root.files are skipped (user doesn't want to see root-level files in tree mode)
 
   return (
     <>
       {tree.children.map(child => (
         <FolderSubtree key={child.fullPath} node={child} props={props} colSpan={colSpan}
-          depth={0} collapsed={collapsed} toggle={toggle} counter={counter} onExpand={onExpand} />
+          depth={0} collapsed={collapsed} toggle={toggle} counter={counter} onExpand={onExpand} view={view} />
       ))}
     </>
   );
 }
 
-function FolderSubtree({ node, props, colSpan, depth, collapsed, toggle, counter, onExpand }: {
+function FolderSubtree({ node, props, colSpan, depth, collapsed, toggle, counter, onExpand, view }: {
   node: TreeNode; props: Property[]; colSpan: number; depth: number;
   collapsed: Set<string>; toggle: (p: string) => void; counter: { n: number };
   onExpand: (row: Row) => void;
+  view: ViewConfig;
 }) {
   const isCollapsed = collapsed.has(node.fullPath);
   const indent = depth * 20;
@@ -211,20 +210,16 @@ function FolderSubtree({ node, props, colSpan, depth, collapsed, toggle, counter
         <>
           {node.files.map(row => {
             counter.n++;
-            return <TableRow key={row._id} row={row} index={counter.n} props={props} isSourced depth={depth + 1} onExpand={onExpand} />;
+            return <TableRow key={row._id} row={row} index={counter.n} props={props} isSourced depth={depth + 1} onExpand={onExpand} view={view} />;
           })}
           {node.children.map(child => (
             <FolderSubtree key={child.fullPath} node={child} props={props} colSpan={colSpan}
-              depth={depth + 1} collapsed={collapsed} toggle={toggle} counter={counter} onExpand={onExpand} />
+              depth={depth + 1} collapsed={collapsed} toggle={toggle} counter={counter} onExpand={onExpand} view={view} />
           ))}
         </>
       )}
     </>
   );
-}
-
-function countAll(node: TreeNode): number {
-  return node.files.length + node.children.reduce((s, c) => s + countAll(c), 0);
 }
 
 // ─── Header Cell ──────────────────────────────────────────────────────────────
@@ -324,9 +319,10 @@ function PropTypeMenu({ prop, dispatch, onClose }: { prop: Property; dispatch: a
 
 // ─── Table Row ────────────────────────────────────────────────────────────────
 
-function TableRow({ row, index, props, isSourced, depth = 0, onExpand }: {
+function TableRow({ row, index, props, isSourced, depth = 0, onExpand, view }: {
   row: Row; index: number; props: Property[]; isSourced: boolean; depth?: number;
   onExpand: (row: Row) => void;
+  view: ViewConfig;
 }) {
   const { dispatch, app } = useStore();
   const [hovered, setHovered] = useState(false);
@@ -357,15 +353,6 @@ function TableRow({ row, index, props, isSourced, depth = 0, onExpand }: {
     e.preventDefault();
     const draggedId = e.dataTransfer?.getData('text/plain');
     if (!draggedId || draggedId === row._id) { setIsDragOver(null); return; }
-    if (isDragOver === 'top') {
-      // find the row before this one and use it as afterId
-      dispatch({ type: 'MOVE_ROW', rowId: draggedId, afterId: null }); // simplified: drop before = move to null first then re-handle
-      // Actually: drop on top of this row = insert after the row before this one
-      // We'll dispatch MOVE_ROW with afterId = null to indicate "before current"
-      // But MOVE_ROW only supports afterId. We'll use a workaround: use MOVE_ROW to put after "previous" row
-      // For simplicity: if top half, afterId = null means insert at top; we'll handle properly below
-    }
-    // Use bottom/top to decide afterId
     const afterId = isDragOver === 'bottom' ? row._id : null;
     dispatch({ type: 'MOVE_ROW', rowId: draggedId, afterId });
     setIsDragOver(null);
@@ -401,7 +388,7 @@ function TableRow({ row, index, props, isSourced, depth = 0, onExpand }: {
         }
       </td>
       {props.map((p, i) => (
-        <td key={p.id} class={`ne-td ${p.wrap ? 'ne-td-wrap' : ''}`} style={{ width: `${p.width ?? 160}px` }}>
+        <td key={p.id} class={`ne-td ${(view.wrap || p.wrap) ? 'ne-td-wrap' : ''}`} style={{ width: `${p.width ?? 160}px` }}>
           {i === 0
             ? <div class="ne-name-cell" style={indent > 0 ? `padding-left: ${indent + 8}px` : ''}>
                 {row._ext && row._ext !== 'md' && (

@@ -83,6 +83,7 @@ export interface ViewConfig {
   filters?: FilterRule[];
   sorts?: SortRule[];
   pageSize?: number;
+  wrap?: boolean;    // global wrap setting for the view
 }
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
